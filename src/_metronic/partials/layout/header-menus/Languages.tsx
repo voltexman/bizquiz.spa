@@ -1,3 +1,4 @@
+
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import clsx from 'clsx'
 import {FC} from 'react'
@@ -11,30 +12,30 @@ const languages = [
     flag: toAbsoluteUrl('/media/flags/united-states.svg'),
   },
   {
-    lang: 'zh',
-    name: 'Mandarin',
-    flag: toAbsoluteUrl('/media/flags/china.svg'),
+    lang: 'uk',
+    name: 'Українська',
+    flag: toAbsoluteUrl('/media/flags/ukraine.svg'),
   },
-  {
-    lang: 'es',
-    name: 'Spanish',
-    flag: toAbsoluteUrl('/media/flags/spain.svg'),
-  },
-  {
-    lang: 'ja',
-    name: 'Japanese',
-    flag: toAbsoluteUrl('/media/flags/japan.svg'),
-  },
-  {
-    lang: 'de',
-    name: 'German',
-    flag: toAbsoluteUrl('/media/flags/germany.svg'),
-  },
-  {
-    lang: 'fr',
-    name: 'French',
-    flag: toAbsoluteUrl('/media/flags/france.svg'),
-  },
+  // {
+  //   lang: 'es',
+  //   name: 'Spanish',
+  //   flag: toAbsoluteUrl('/media/flags/spain.svg'),
+  // },
+  // {
+  //   lang: 'ja',
+  //   name: 'Japanese',
+  //   flag: toAbsoluteUrl('/media/flags/japan.svg'),
+  // },
+  // {
+  //   lang: 'de',
+  //   name: 'German',
+  //   flag: toAbsoluteUrl('/media/flags/germany.svg'),
+  // },
+  // {
+  //   lang: 'fr',
+  //   name: 'French',
+  //   flag: toAbsoluteUrl('/media/flags/france.svg'),
+  // },
 ]
 
 const Languages: FC = () => {

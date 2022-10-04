@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React from 'react'
+ import React from 'react'
 import {useIntl} from 'react-intl'
 import {KTSVG} from '../../../helpers'
 import {AsideMenuItemWithSub} from './AsideMenuItemWithSub'
@@ -13,14 +13,8 @@ export function AsideMenuMain() {
       <AsideMenuItem
         to='/dashboard'
         icon='/media/icons/duotune/art/art002.svg'
-        title={intl.formatMessage({id: 'MENU.DASHBOARD'})}
+        title={intl.formatMessage({id: 'MENU.MY_QUIZZESS'})}
         fontIcon='bi-app-indicator'
-      />
-      <AsideMenuItem
-        to='/builder'
-        icon='/media/icons/duotune/general/gen019.svg'
-        title='Layout Builder'
-        fontIcon='bi-layers'
       />
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>

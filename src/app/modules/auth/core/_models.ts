@@ -44,6 +44,11 @@ export interface UserSocialNetworksModel {
 }
 
 export interface UserModel {
+  users: [
+    {
+      emailVerified: boolean
+    }
+  ]
   id: number
   username: string
   password: string | undefined
@@ -56,6 +61,7 @@ export interface UserModel {
   phone?: string
   roles?: Array<number>
   pic?: string
+  emailVerified: boolean
   language?: 'en' | 'de' | 'es' | 'fr' | 'ja' | 'zh' | 'ru'
   timeZone?: string
   website?: 'https://keenthemes.com'

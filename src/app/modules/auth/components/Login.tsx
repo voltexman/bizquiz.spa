@@ -1,12 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {useState} from 'react'
+import { useState } from 'react'
 import * as Yup from 'yup'
 import clsx from 'clsx'
-import {Link} from 'react-router-dom'
-import {useFormik} from 'formik'
-import {getUserByToken, login} from '../core/_requests'
-import {toAbsoluteUrl} from '../../../../_metronic/helpers'
-import {useAuth} from '../core/Auth'
+import { Link } from 'react-router-dom'
+import { useFormik } from 'formik'
+import { getUserByToken, login } from '../core/_requests'
+import { toAbsoluteUrl } from '../../../../_metronic/helpers'
+import { useAuth } from '../core/Auth'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -33,23 +34,28 @@ const initialValues = {
 
 export function Login() {
   const [loading, setLoading] = useState(false)
-  const {saveAuth, setCurrentUser} = useAuth()
+  const { saveAuth, setCurrentUser } = useAuth()
+
+  const intl = useIntl()
 
   const formik = useFormik({
     initialValues,
     validationSchema: loginSchema,
-    onSubmit: async (values, {setStatus, setSubmitting}) => {
+    onSubmit: async (values, { setStatus, setSubmitting }) => {
       setLoading(true)
       try {
-        const {data: auth} = await login(values.email, values.password, true)
-        saveAuth(auth)
-        const {data: user} = await getUserByToken(auth.idToken)
-        console.log(user)
-        setCurrentUser(user)
+        const { data: auth } = await login(values.email, values.password)
+        const { data: user } = await getUserByToken(auth.idToken)
+        if (user.users[0].emailVerified === true) {
+          saveAuth(auth)
+          setCurrentUser(user)
+        } else {
+          setStatus(intl.formatMessage({ id: 'AUTH.LOGIN.EMAIL_NOT_CONFIRMED' }))
+        }
       } catch (error) {
         console.error(error)
         saveAuth(undefined)
-        setStatus('The login detail is incorrect')
+        setStatus(intl.formatMessage({ id: 'AUTH.VALIDATION.INVALID_LOGIN' }))
         setSubmitting(false)
         setLoading(false)
       }
@@ -57,19 +63,22 @@ export function Login() {
   })
 
   return (
-    <form
-      className='form w-100'
+    <><form
+      className="form w-100"
       onSubmit={formik.handleSubmit}
-      noValidate
-      id='kt_login_signin_form'
+      noValidate id="kt_sign_in_form"
+      data-kt-redirect-url="/metronic8/demo1/../demo1/index.html"
     >
+
       {/* begin::Heading */}
       <div className='text-center mb-10'>
-        <h1 className='text-dark mb-3'>Sign In to Metronic</h1>
+        <h1 className='text-dark mb-3'>
+          {intl.formatMessage({ id: 'AUTH.LOGIN.TITLE' })}
+        </h1>
         <div className='text-gray-400 fw-bold fs-4'>
-          New Here?{' '}
-          <Link to='/auth/registration' className='link-primary fw-bolder'>
-            Create an Account
+          {intl.formatMessage({ id: 'AUTH.LOGIN.NEW_HERE' })}{' '}
+          < Link to='/auth/registration' className='link-primary fw-bolder' >
+            {intl.formatMessage({ id: 'AUTH.LOGIN.REGISTER_BUTTON' })}
           </Link>
         </div>
       </div>
@@ -81,30 +90,50 @@ export function Login() {
         </div>
       ) : (
         <div className='mb-10 bg-light-info p-8 rounded'>
-          <div className='text-info'>
-            Use account <strong>admin@demo.com</strong> and password <strong>demo</strong> to
-            continue.
+          <div className='text-info fw-semibold'>
+            <FormattedMessage
+              id="AUTH.LOGIN.TEST_ACCOUNT_MESSAGE"
+              values={{
+                email: <strong>admin@test.com</strong>,
+                password: <strong>admintest</strong>
+              }}
+            />
+            {/* {intl.formatMessage({ id: 'AUTH.LOGIN.TEST_ACCOUNT_MESSAGE' })} */}
           </div>
         </div>
       )}
+      <div className="row g-3 mb-9">
+        <div className="col-md-6">
+          <a href="#" className="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
+            <img alt="Logo" src={toAbsoluteUrl('/media/svg/brand-logos/google-icon.svg')} className="h-20px me-3" />{intl.formatMessage({ id: 'AUTH.LOGIN.SIGN_IN_BY_GOOGLE' })}</a>
+        </div>
+        <div className="col-md-6">
+          <a href="#" className="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
+            <img alt="Logo" src={toAbsoluteUrl('/media/svg/brand-logos/facebook-4.svg')} className="h-20px me-3" />{intl.formatMessage({ id: 'AUTH.LOGIN.SIGN_IN_BY_FACEBOOK' })}</a>
+        </div>
+      </div>
+      <div className="separator separator-content my-14">
+        <span className="w-125px text-gray-500 fw-semibold fs-7">
+          {intl.formatMessage({ id: 'AUTH.LOGIN.SIGN_IN_OR_BY_EMAIL' })}
+        </span>
+      </div>
 
       {/* begin::Form group */}
       <div className='fv-row mb-10'>
         <label className='form-label fs-6 fw-bolder text-dark'>Email</label>
         <input
-          placeholder='Email'
+          placeholder={intl.formatMessage({ id: 'AUTH.LOGIN.INPUT_EMAIL_PLACEHOLDER' })}
           {...formik.getFieldProps('email')}
           className={clsx(
             'form-control form-control-lg form-control-solid',
-            {'is-invalid': formik.touched.email && formik.errors.email},
+            { 'is-invalid': formik.touched.email && formik.errors.email },
             {
               'is-valid': formik.touched.email && !formik.errors.email,
             }
           )}
           type='email'
           name='email'
-          autoComplete='off'
-        />
+          autoComplete='off' />
         {formik.touched.email && formik.errors.email && (
           <div className='fv-plugins-message-container'>
             <span role='alert'>{formik.errors.email}</span>
@@ -118,15 +147,17 @@ export function Login() {
         <div className='d-flex justify-content-between mt-n5'>
           <div className='d-flex flex-stack mb-2'>
             {/* begin::Label */}
-            <label className='form-label fw-bolder text-dark fs-6 mb-0'>Password</label>
+            <label className='form-label fw-bolder text-dark fs-6 mb-0'>
+              {intl.formatMessage({ id: 'AUTH.INPUT.PASSWORD' })}
+            </label>
             {/* end::Label */}
             {/* begin::Link */}
             <Link
               to='/auth/forgot-password'
               className='link-primary fs-6 fw-bolder'
-              style={{marginLeft: '5px'}}
+              style={{ marginLeft: '5px' }}
             >
-              Forgot Password ?
+              {intl.formatMessage({ id: 'AUTH.GENERAL.FORGOT_BUTTON' })}
             </Link>
             {/* end::Link */}
           </div>
@@ -143,8 +174,7 @@ export function Login() {
             {
               'is-valid': formik.touched.password && !formik.errors.password,
             }
-          )}
-        />
+          )} />
         {formik.touched.password && formik.errors.password && (
           <div className='fv-plugins-message-container'>
             <div className='fv-help-block'>
@@ -160,56 +190,20 @@ export function Login() {
         <button
           type='submit'
           id='kt_sign_in_submit'
-          className='btn btn-lg btn-primary w-100 mb-5'
+          className='btn btn-primary w-100 mb-5'
           disabled={formik.isSubmitting || !formik.isValid}
         >
-          {!loading && <span className='indicator-label'>Continue</span>}
+          {!loading && <span className='indicator-label'>{intl.formatMessage({ id: 'AUTH.GENERAL.SIGNUP_BUTTON' })}</span>}
           {loading && (
-            <span className='indicator-progress' style={{display: 'block'}}>
+            <span className='indicator-progress' style={{ display: 'block' }}>
               Please wait...
               <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
             </span>
           )}
         </button>
-
-        {/* begin::Separator */}
-        <div className='text-center text-muted text-uppercase fw-bolder mb-5'>or</div>
-        {/* end::Separator */}
-
-        {/* begin::Google link */}
-        <a href='#' className='btn btn-flex flex-center btn-light btn-lg w-100 mb-5'>
-          <img
-            alt='Logo'
-            src={toAbsoluteUrl('/media/svg/brand-logos/google-icon.svg')}
-            className='h-20px me-3'
-          />
-          Continue with Google
-        </a>
-        {/* end::Google link */}
-
-        {/* begin::Google link */}
-        <a href='#' className='btn btn-flex flex-center btn-light btn-lg w-100 mb-5'>
-          <img
-            alt='Logo'
-            src={toAbsoluteUrl('/media/svg/brand-logos/facebook-4.svg')}
-            className='h-20px me-3'
-          />
-          Continue with Facebook
-        </a>
-        {/* end::Google link */}
-
-        {/* begin::Google link */}
-        <a href='#' className='btn btn-flex flex-center btn-light btn-lg w-100'>
-          <img
-            alt='Logo'
-            src={toAbsoluteUrl('/media/svg/brand-logos/apple-black.svg')}
-            className='h-20px me-3'
-          />
-          Continue with Apple
-        </a>
-        {/* end::Google link */}
       </div>
       {/* end::Action */}
-    </form>
+
+    </form></>
   )
 }

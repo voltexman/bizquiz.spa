@@ -11,13 +11,13 @@ export const REQUEST_PASSWORD_URL = `${API_URL}/forgot_password`
 export const LOGIN_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCvo7LLsbcBClkLcQiwxekdnmIch6BhwrM'
 export const GET_USER_BY_ACCESSTOKEN_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCvo7LLsbcBClkLcQiwxekdnmIch6BhwrM'
 export const REGISTER_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCvo7LLsbcBClkLcQiwxekdnmIch6BhwrM'
+export const EMAIL_VERIFICATION_URL = 'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCvo7LLsbcBClkLcQiwxekdnmIch6BhwrM'
 
 // Server should return AuthModel
-export function login(email: string, password: string, returnSecureToken: true) {
+export function login(email: string, password: string) {
   return axios.post<AuthModel>(LOGIN_URL, {
     email,
     password,
-    returnSecureToken,
   })
 }
 
@@ -47,6 +47,13 @@ export function requestPassword(email: string) {
 
 export function getUserByToken(token: string) {
   return axios.post<UserModel>(GET_USER_BY_ACCESSTOKEN_URL, {
+    idToken: token,
+  })
+}
+
+export function sendEmailVerification(token: string) {
+  return axios.post(EMAIL_VERIFICATION_URL, {
+    requestType: 'VERIFY_EMAIL',
     idToken: token,
   })
 }
